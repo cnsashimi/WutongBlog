@@ -2,7 +2,6 @@
 
 ### 简介
 原来就是一个写php 和 java的马楼，尝试一下go，所以有了这个。
-[![sclouder/梧桐树下Blog Go版本](https://gitee.com/cnsashimi/imzixuan-go/widgets/widget_card.svg?colors=393222,ebdfc1,fffae5,d8ca9f,393222,a28b40)](https://gitee.com/cnsashimi/imzixuan-go)
 ### 更新历史
 -  **2024/12/21**   V0.6.0 上线 https://www.imzixuan.cn/ 
 -  **2024/12/20**   V0.5.8 前后台规整
