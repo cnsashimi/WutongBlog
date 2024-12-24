@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" href="/component/layui/css/layui.css?v=2.8.12" />
+        <link rel="stylesheet" href="/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/admin/css/reset.css" />
+    </head>
+    <body class="pear-container">
+        <style>
+            .layui-input-block input {
+                width: 300px;
+            }
+        </style>
+
+        <div class="layui-card">
+            <div class="layui-card-body">
+
+                <div class="layui-tab layui-tab-brief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">基本信息</li>
+                    <li>安全设置</li>
+                </ul>
+                <div class="layui-tab-content">
+
+                    <!-- 基本信息 -->
+                    <div class="layui-tab-item layui-show">
+
+                        <form class="layui-form" lay-filter="baseInfo">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">昵称</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="nickname" required  lay-verify="required" placeholder="请输入昵称" autocomplete="off" class="layui-input" value="{{.uinfo.Nickname}}">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <button type="button" class="layui-btn" id="ID-upload-avatar-btn">
+                                    <i class="layui-icon layui-icon-upload"></i> 头像上传
+                                </button>
+                                <div style="width: 132px;">
+                                    <div class="layui-upload-list">
+                                        <img class="layui-upload-img" id="ID-upload-avatar-img" style="width: 100%; height: 92px;" src="{{.uinfo.Avatar}}">
+                                        <div id="ID-upload-avatar-text"></div>
+                                    </div>
+                                    <div class="layui-progress layui-progress-big" lay-showPercent="yes" lay-filter="filter-avatar">
+                                        <div class="layui-progress-bar" lay-percent=""></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="avatarfile" id="avatarfile" value="{{.uinfo.Avatar}}">
+                            </div>
+
+                            <div class="layui-form-item">
+                                <div class="layui-col-md12">
+                                    <div class="layui-card">
+                                        <div class="layui-card-header">个人介绍</div>
+                                        <div class="layui-card-body">
+                                            <textarea name="aboutme" id="aboutme" cols="30" rows="10">{{.uinfo.Aboutme}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="saveBaseInfo">
+                                        提交
+                                    </button>
+                                    <button type="reset" class="pear-btn pear-btn-md">
+                                        重置
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <div class="layui-tab-item">
+
+                        <form class="layui-form" action="">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">原始密码</label>
+                                <div class="layui-input-block">
+                                    <input type="password" name="old_password" required  lay-verify="required" placeholder="请输入原始密码" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">新密码</label>
+                                <div class="layui-input-block">
+                                    <input type="password" name="password" required  lay-verify="required" placeholder="请输入新密码" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">确认新密码</label>
+                                <div class="layui-input-block">
+                                    <input type="password" name="password_confirm" required  lay-verify="required" placeholder="请再次输入新密码" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="savePassword">
+                                        提交
+                                    </button>
+                                    <button type="reset" class="pear-btn pear-btn-md">
+                                        重置
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+
+        <script src="/component/layui/layui.js?v=2.8.12"></script>
+        <script src="/component/pear/pear.js"></script>
+
+        <script>
+
+            layui.use(["form", "popup","tinymce"], function () {
+                let form = layui.form;
+                let $ = layui.$;
+                var tinymce = layui.tinymce
+
+                form.on("submit(saveBaseInfo)", function(data){
+                    data.field.aboutme = tinymce.get('#aboutme').getContent();
+
+                    $.ajax({
+                        url: "/admin/accountupdate",
+                        dataType: "json",
+                        type: "POST",
+                        data: data.field,
+                        success: function (res) {
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            }
+                            return layui.popup.success("操作成功");
+                        }
+                    });
+                    return false;
+                });
+
+                form.on("submit(savePassword)", function(data){
+                    $.ajax({
+                        url: "/admin/resetpassword",
+                        dataType: "json",
+                        type: "POST",
+                        data: data.field,
+                        success: function (res) {
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            }
+                            return layui.popup.success("操作成功");
+                        }
+                    });
+                    return false;
+                });
+
+            });
+
+
+            layui.use(['tinymce'], function () {
+                var tinymce = layui.tinymce
+                var edit = tinymce.render({
+                    elem: "#aboutme",
+                    height: 400,
+                    images_upload_url: "/admin/uploadimg"
+                });
+            });
+
+            layui.use(function(){
+                var upload = layui.upload;
+                var layer = layui.layer;
+                var element = layui.element;
+                var $ = layui.$;
+                // 单图片上传
+                var uploadInst = upload.render({
+                    elem: '#ID-upload-avatar-btn',
+                    url: '/admin/uploadavatar',
+                    accept: 'images',
+                    field: "avatar",
+                    size: 1024,
+                     acceptMime: 'image/jpeg, image/png',
+                    exts: 'jpeg|jpg|png',
+
+                    before: function(obj){
+
+                        obj.preview(function(index, file, result){
+                            $('#ID-upload-avatar-img').attr('src', result); // 图片链接（base64）
+                        });
+
+                        element.progress('filter-avatar', '0%'); // 进度条复位
+                        layer.msg('上传中', {icon: 16, time: 0});
+                    },
+                    done: function(res){
+                        // 若上传失败
+                        if(res.code > 0){
+                            return layer.msg('上传失败');
+                        }
+
+
+                        if(res.code == 0){
+                            console.log(res.data.url);
+                            $('#avatarfile').val(res.data.url);
+                        }
+                        $('#ID-upload-avatar-text').html('');
+                    },
+                    error: function(){
+
+                        var avatarText = $('#ID-upload-avatar-text');
+                        avatarText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs avatar-reload">重试</a>');
+                        avatarText.find('.avatar-reload').on('click', function(){
+                            uploadInst.upload();
+                        });
+                    },
+                    // 进度条
+                    progress: function(n, elem, e){
+                        element.progress('filter-avatar', n + '%'); // 可配合 layui 进度条元素使用
+                        if(n == 100){
+                            layer.msg('上传完毕', {icon: 1});
+                        }
+                    }
+                });
+
+
+            });
+        </script>
+
+    </body>
+</html>

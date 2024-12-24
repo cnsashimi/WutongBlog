@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+   <meta charset="utf-8">
+   <title>{{.setting.Name}} - {{.title}}</title>
+
+   <!-- mobile responsive meta -->
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+	<meta name="description" content="{{.setting.Description}}-{{.title}}列表">
+	<meta name="keywords" content="{{.setting.Keywords}},{{.title}}">
+
+   <!-- plugins -->
+     <link rel="stylesheet" href="/plugins/bootstrap/bootstrap.min.css">
+
+   <link rel="stylesheet" href="/plugins/themify-icons/themify-icons.css">
+   <link rel="stylesheet" href="/plugins/slick/slick.css">
+
+   <!-- Main Stylesheet -->
+   <link rel="stylesheet" href="/css/style.css">
+
+   <!--Favicon-->
+   <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
+   <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+	<!--   layui-->
+	<link href="/component/layui/css/layui.css" rel="stylesheet">
+</head>
+
+<body>
+<!-- header -->
+{{template "partials/header" .}}
+<!-- /header -->
+<section class="section-sm border-bottom">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="title-bordered mb-5 d-flex align-items-center">
+					<h1 class="h4">{{.user.Nickname}}</h1>
+					<ul class="list-inline social-icons ml-auto mr-3 d-none d-sm-block">
+<!--						<li class="list-inline-item"><a href="#"><i class="ti-facebook"></i></a>-->
+<!--						</li>-->
+<!--						<li class="list-inline-item"><a href="#"><i class="ti-twitter-alt"></i></a>-->
+<!--						</li>-->
+<!--						<li class="list-inline-item"><a href="#"><i class="ti-github"></i></a>-->
+<!--						</li>-->
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-4 mb-4 mb-md-0 text-center text-md-left">
+				<img loading="lazy" class="rounded-lg img-fluid" src="{{.user.Avatar}}" alt="{{.user.Nickname}}头像">
+			</div>
+			<div class="col-lg-9 col-md-8 content text-center text-md-left">
+				{{raw .user.Aboutme}}
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="section-sm">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="title text-center">
+					<h2 class="mb-5">{{.user.Nickname}}的文章</h2>
+				</div>
+			</div>
+			{{ range  .blogs  }}
+			<div class="col-lg-4 col-sm-6 mb-4">
+				<article class="mb-5">
+					<div class="post-slider slider-sm">
+						{{ range  .Imagess  }}
+						<img loading="lazy" src="{{ . }}" class="img-fluid" alt="{{ . }}" >
+						{{ end }}
+
+					</div>
+					<h3 class="h5"><a class="post-title" href="/detail_{{.ID}}.html">{{.Title}}</a></h3>
+					<ul class="list-inline post-meta mb-2">
+						{{ if eq .Totop 1  }}
+						<li class="list-inline-item">
+							<span style="color: red;  "><strong>[置顶]</strong></span>
+						</li>
+						{{ end }}
+						<li class="list-inline-item"><i class="ti-user mr-2"></i><a href="/author/{{.By}}/">{{.Author}}</a>
+						</li>
+						<li class="list-inline-item">时间 : {{.AddtimeFormat}}</li>
+						<li class="list-inline-item">分类 : <a href="/cate/{{.Cid}}/" class="ml-1">{{.Categories}}</a>
+						</li>
+						<li class="list-inline-item">标签 :
+							{{ range  .Tagss  }}
+							<a href="/tags/{{.ID}}/" class="ml-1">{{.Name}} </a>
+							{{ end }}
+						</li>
+					</ul>
+					<p>{{.Textmini}}</p>	<a href="/detail_{{.ID}}.html" class="btn btn-outline-primary">阅读全文</a>
+				</article>
+			</div>
+		 	{{end}}
+
+			<div class="col-lg-12">
+				<div class="title text-center">
+				<div id="list-laypage-normal-1"></div>
+				</div>
+		</div>
+	</div>
+</section>
+
+<!-- footer -->
+{{template "partials/footer" .}}
+<!-- /footer -->
+
+   <!-- JS Plugins -->
+   <script src="/plugins/jQuery/jquery.min.js"></script>
+   <script src="/plugins/bootstrap/bootstrap.min.js" async></script>
+   <script src="/plugins/slick/slick.min.js"></script>
+
+   <!-- Main Script -->
+   <script src="/js/script.js"></script>
+
+<!--layui-->
+<script src="/component/layui/layui.js"></script>
+<script>
+	layui.use(function(){
+		var laypage = layui.laypage;
+		laypage.render({
+			elem: 'list-laypage-normal-1',
+			count: {{ .page.ItemSize }},
+		limit: {{ .page.PageSize }},
+		curr: {{ .page.PageNo }},
+		jump: function(obj, first) {
+			if (!first) {
+				location.href="?page="+obj.curr ;
+			}
+		}
+	});
+
+
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+   <meta charset="utf-8">
+   <title>{{.setting.Name}} - {{.title}}列表</title>
+
+   <!-- mobile responsive meta -->
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+	<meta name="description" content="{{.setting.Description}}-{{.title}}列表">
+	<meta name="keywords" content="{{.setting.Keywords}},{{.title}}">
+   <!-- plugins -->
+    <link rel="stylesheet" href="/plugins/bootstrap/bootstrap.min.css">
+
+   <link rel="stylesheet" href="/plugins/themify-icons/themify-icons.css">
+   <link rel="stylesheet" href="/plugins/slick/slick.css">
+
+   <!-- Main Stylesheet -->
+   <link rel="stylesheet" href="/css/style.css">
+	<!--   layui-->
+	<link href="/component/layui/css/layui.css" rel="stylesheet">
+
+   <!--Favicon-->
+   <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
+   <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+</head>
+
+<body>
+<!-- header -->
+{{template "partials/header" .}}
+<!-- /header -->
+
+<section class="section">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="title-bordered mb-5 d-flex align-items-center">
+		<h1 class="h4">{{.title}}</h1>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12  mb-5 mb-lg-0">
+				{{ range  .blogs  }}
+				<article class="row mb-5">
+					<div class="col-md-4 mb-4 mb-md-0">
+						<div class="post-slider slider-sm">
+							{{ range  .Imagess  }}
+							<img loading="lazy" src="{{ . }}" class="img-fluid" alt="{{ . }}"  style="height:200px; object-fit: cover;">
+							{{ end }}
+
+						</div>
+					</div>
+					<div class="col-md-8">
+						<h3 class="h5"><a class="post-title" href="/detail_{{.ID}}.html">{{.Title}}</a></h3>
+						<ul class="list-inline post-meta mb-2">
+							{{ if eq .Totop 1  }}
+							<li class="list-inline-item">
+								<span style="color: red;  "><strong>[置顶]</strong></span>
+							</li>
+							{{ end }}
+							<li class="list-inline-item"><i class="ti-user mr-2"></i><a href="/author/{{.By}}">{{.Author}}</a>
+							</li>
+							<li class="list-inline-item">时间 : {{.AddtimeFormat}}</li>
+							<li class="list-inline-item">分类 : <a href="/cate/{{.Cid}}/" class="ml-1">{{.Categories}} </a>
+							</li>
+							<li class="list-inline-item">标签 :
+								{{ range  .Tagss  }}
+								<a href="/tags/{{.ID}}/" class="ml-1">{{.Name}} </a>
+								{{ end }}
+							</li>
+						</ul>
+						<p>{{.Textmini}}</p>
+						<a href="/detail_{{.ID}}.html" class="btn btn-outline-primary">阅读全文</a>
+					</div>
+				</article>
+				{{end}}
+				<div id="list-laypage-normal-1"></div>
+
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- footer -->
+{{template "partials/footer" .}}
+<!-- /footer -->
+   <!-- JS Plugins -->
+   <script src="/plugins/jQuery/jquery.min.js"></script>
+   <script src="/plugins/bootstrap/bootstrap.min.js" async></script>
+   <script src="/plugins/slick/slick.min.js"></script>
+
+   <!-- Main Script -->
+   <script src="/js/script.js"></script>
+<!--layui-->
+<script src="/component/layui/layui.js"></script>
+<script>
+	layui.use(function(){
+		var laypage = layui.laypage;
+		laypage.render({
+			elem: 'list-laypage-normal-1',
+			count: {{ .page.ItemSize }},
+		limit: {{ .page.PageSize }},
+		curr: {{ .page.PageNo }},
+		jump: function(obj, first) {
+			if (!first) {
+				location.href="?page="+obj.curr ;
+			}
+		}
+	});
+
+
+	});
+</script>
+</body>
+</html>

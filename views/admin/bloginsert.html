@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>新增Blog</title>
+    <link rel="stylesheet" href="/component/pear/css/pear.css"/>
+    <link rel="stylesheet" href="/admin/css/reset.css"/>
+
+
+</head>
+<body>
+
+<form class="layui-form" action="">
+
+    <div class="mainBox">
+        <div class="main-container mr-5">
+
+            <div class="layui-form-item">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                    <legend>标题</legend>
+                </fieldset>
+                <div class="layui-input-block">
+                    <input type="text" name="Title" value="" required lay-verify="required" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item" pane>
+                <label class="layui-form-label">置顶</label>
+                <div class="layui-input-block">
+                    <input type="checkbox"  name="Totop" lay-skin="switch" lay-filter="switchTest" title="置顶">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                    <legend>分类</legend>
+                </fieldset>
+                <div class="layui-col-md12">
+                    <select name="Cid" lay-verify="required">
+                        <option value="">请选择</option>
+                        {{ range .categories }}
+                        <option value="{{.ID}}"
+
+
+                        >{{.Name}}({{.Count}})
+                        </option>
+                        {{ end }}
+
+
+                    </select>
+                </div>
+
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-col-md12">
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                        <legend>标签</legend>
+                    </fieldset>
+
+                    <div class="layui-btn-container tag" lay-filter="tags" lay-allowclose="true" lay-newTag="true">
+                        <div class="fairy-tag-container">
+                            <input type="text" class="fairy-tag-input tag2" autocomplete="off" value="">
+                        </div>
+
+                        <input type="hidden" name="tagss" id="tagss" value="">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <div class="layui-col-md12">
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                        <legend>封面图</legend>
+                    </fieldset>
+                    <button type="button" class="layui-btn" id="ID-upload-btn">
+                        <i class="layui-icon layui-icon-upload"></i> 图片上传
+                    </button>
+
+                    <div style="width: 132px;">
+                        <div class="layui-upload-list">
+                            <img class="layui-upload-img" id="ID-upload-demo-img" style="width: 100%; height: 92px;">
+                            <div id="ID-upload-demo-text"></div>
+                        </div>
+                        <div class="layui-progress layui-progress-big" lay-showPercent="yes" lay-filter="filter-demo">
+                            <div class="layui-progress-bar" lay-percent=""></div>
+                        </div>
+                    </div>
+
+                    <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 11px;">
+                        预览：
+                        <div class="layui-upload-list" id="upload-preview"></div>
+                        <input  type="hidden" name="Upimgs" id="Upimgs" value="[]">
+
+                    </blockquote>
+                </div>
+
+            </div>
+
+
+            <div class="layui-form-item">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                            <legend>正文</legend>
+                        </fieldset>
+                        <div class="layui-card-body">
+                            <textarea name="Text" id="Text" cols="30" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit=""
+                    lay-filter="save">
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-md">
+                重置
+            </button>
+        </div>
+    </div>
+
+</form>
+
+<script src="/component/layui/layui.js?v=2.8.12"></script>
+<script src="/component/pear/pear.js"></script>
+
+<script>
+
+ 
+    // 相关接口
+    const INSERT_API = "/admin/blogsubmit";
+    const DELETEIMG_URL = "/admin/deleteimg";
+
+
+    //提交事件
+    layui.use(["form", "popup", "tinymce"], function () {
+        var tinymce = layui.tinymce
+        layui.form.on("submit(save)", function (data) {
+            data.field.Text = tinymce.get('#Text').getContent();
+            layui.$.ajax({
+                url: INSERT_API,
+                type: "POST",
+                dateType: "json",
+                data: data.field,
+                success: function (res) {
+                    if (res.code) {
+                        return layui.popup.failure(res.msg);
+                    }
+                    return layui.popup.success("操作成功", function () {
+                        parent.refreshTable();
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    });
+                }
+            });
+            return false;
+        });
+    });
+
+
+    layui.use(function () {
+        var upload = layui.upload;
+        var layer = layui.layer;
+        var element = layui.element;
+        var $ = layui.$;
+        // 单图片上传
+        var uploadInst = upload.render({
+            elem: '#ID-upload-btn',
+            url: '/admin/uploadimg',
+            accept: 'images',
+            field: "edit",
+            size: 1024,
+
+            acceptMime: 'image/jpeg, image/png',
+            exts: 'jpeg|jpg|png',
+
+            before: function (obj) {
+                obj.preview(function (index, file, result) {
+                    $('#ID-upload-demo-img').attr('src', result); // 图片链接（base64）
+                });
+
+                element.progress('filter-demo', '0%'); // 进度条复位
+                layer.msg('上传中', {icon: 16, time: 0});
+            },
+            done: function (res) {
+                // 若上传失败
+                if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }
+                if (res.code == 0) {
+
+                    try {
+                        var imgsarr = JSON.parse($('#Upimgs').val());
+                    } catch {
+                        var imgsarr = new Array();
+                    }
+                    imgsarr.push(res.data.url);
+
+
+                    if (imgsarr.length >= 3) {
+                        //就简单的禁用 隐藏 按钮
+                        $("#ID-upload-btn").attr("disabled", true);
+                        $("#ID-upload-btn").attr("style", "display:none;");
+
+                    }
+
+
+
+
+
+                    $('#upload-preview').html("");
+
+                    for (let key in imgsarr) {
+                        $('#upload-preview').append('<img src="' + imgsarr[key] + '" alt="" style="width: 90px; height: 90px;"> <a class="delimg" data-img-url="' + imgsarr[key] + '" href="javascript:void(0)">[X]</a>')
+                    }
+                    $('#Upimgs').val(JSON.stringify(imgsarr));
+
+
+                }
+
+
+                $('#ID-upload-demo-text').html('');
+            },
+            error: function () {
+
+                var demoText = $('#ID-upload-demo-text');
+                demoText.html('<span style="color: #ff0000;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            },
+
+
+            // 进度条
+            progress: function (n, elem, e) {
+                element.progress('filter-demo', n + '%'); // 可配合 layui 进度条元素使用
+                if (n == 100) {
+                    layer.msg('上传完毕', {icon: 1});
+                }
+            }
+        });
+
+
+        $('#upload-preview').on('click', '.delimg', function (event) {
+            var clickedImageUrl = $(this).data('img-url');
+
+            layui.$.ajax({
+                url: DELETEIMG_URL,
+                type: "POST",
+                dateType: "json",
+                data: {"delimg": clickedImageUrl},
+                success: function (res) {
+                    console.log(res);
+                    if (res.code == 0) {
+
+                        try {
+                            var imgsarr = JSON.parse($('#Upimgs').val());
+                        } catch {
+                            var imgsarr = new Array();
+                        }
+                        var newimgsarr = new Array();
+                        $('#upload-preview').html("");
+                        for (let key in imgsarr) {
+                            if (clickedImageUrl != imgsarr[key]) {
+                                $('#upload-preview').append('<img src="' + imgsarr[key] + '" alt="" style="width: 90px; height: 90px;"> <a class="delimg" data-img-url="' + imgsarr[key] + '" href="javascript:void(0)">[X]</a>')
+                                newimgsarr.push(imgsarr[key]);
+                            }else{
+
+
+
+                            }
+                        }
+                        $('#Upimgs').val(JSON.stringify(newimgsarr));
+
+                        if (newimgsarr.length < 3) {
+                            //就简单的禁用 隐藏 按钮
+                            $("#ID-upload-btn").attr("disabled", false);
+                            $("#ID-upload-btn").attr("style", "display:block;");
+
+                        }
+
+
+
+                    }
+
+                    if (res.code > 0) {
+
+                        layer.msg('出错了'+ res.msg, {icon: 2});
+
+
+                    }
+
+
+
+                    }
+            });
+
+
+
+
+
+
+        });
+
+        return;
+    });
+
+    layui.use(['tinymce'], function () {
+        var tinymce = layui.tinymce
+        var edit = tinymce.render({
+            elem: "#Text",
+            height: 400,
+            images_upload_url: "/admin/uploadimg"
+        });
+    });
+
+    layui.use(['inputTag', 'jquery'], function () {
+        var $ = layui.jquery, inputTag = layui.inputTag;
+        // //清空数据方法
+        // tagObj1.clearData();
+        // //获取数据方法
+        // tagObj1.getData();
+        inputTag.render({
+            elem: '.tag2',
+            data: [],
+            permanentData: [],
+            onChange: function (data, value, type) {
+                console.log(arguments);
+                //  $('#tag2').text(JSON.stringify(data));
+                $('#tagss').val(JSON.stringify(data));
+
+            }
+
+        });
+    });
+</script>
+</body>
+</html>

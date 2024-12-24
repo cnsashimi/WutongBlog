@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+   <meta charset="utf-8">
+   <title>{{.setting.Name}}</title>
+
+   <!-- mobile responsive meta -->
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+   <meta name="description" content="{{.setting.Description}}">
+   <meta name="keywords" content="{{.setting.Keywords}}">
+
+    <!-- plugins -->
+
+   <link rel="stylesheet" href="/plugins/bootstrap/bootstrap.min.css">
+
+   <link rel="stylesheet" href="/plugins/themify-icons/themify-icons.css">
+   <link rel="stylesheet" href="/plugins/slick/slick.css">
+
+   <!-- Main Stylesheet -->
+   <link rel="stylesheet" href="/css/style.css">
+
+   <!--   layui-->
+   <link href="/component/layui/css/layui.css" rel="stylesheet">
+
+   <!--Favicon-->
+   <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
+   <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+
+
+
+</head>
+
+<body>
+<!-- header -->
+{{template "partials/header" .}}
+<!-- /header -->
+
+<section class="section">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8  mb-5 mb-lg-0">
+                {{ range  .blogs  }}
+
+				<article class="row mb-5">
+					<div class="col-12">
+						<div class="post-slider">
+                            {{ range  .Imagess  }}
+                            <img loading="lazy" src="{{ . }}" class="img-fluid" alt="{{ . }}">
+                            {{ end }}
+
+						</div>
+					</div>
+					<div class="col-12 mx-auto">
+						<h3><a class="post-title" href="/detail_{{.ID}}.html">{{.Title}}</a></h3>
+						<ul class="list-inline post-meta mb-4">
+                           {{ if eq .Totop 1  }}
+                           <li class="list-inline-item">
+                              <span style="color: red;  "><strong>[置顶]</strong></span>
+                           </li>
+                           {{ end }}
+
+							<li class="list-inline-item"><i class="ti-user mr-2"></i>
+								<a href="/author/{{.By}}/">{{.Author}}</a>
+							</li>
+							<li class="list-inline-item">时间 : {{.AddtimeFormat}}</li>
+							<li class="list-inline-item">分类 : <a href="/cate/{{.Cid}}/" class="ml-1">{{.Categories}} </a>
+							</li>
+							<li class="list-inline-item">标签 :
+                               {{ range  .Tagss  }}
+                               <a href="/tags/{{.ID}}/" class="ml-1">{{.Name}} </a>
+                               {{ end }}
+
+							</li>
+						</ul>
+						<p>{{.Textmini}}</p> <a href="/detail_{{.ID}}.html" class="btn btn-outline-primary">阅读全文</a>
+					</div>
+				</article>
+
+                {{ end }}
+
+               <div id="list-laypage-normal-1"></div>
+
+
+
+            </div>
+			<aside class="col-lg-4">
+
+
+
+               <!-- Search -->
+   <div class="widget">
+      <h5 class="widget-title"><span>搜索</span></h5>
+      <form action="/search" class="widget-search">
+         <input id="search-query" name="s" type="search" placeholder="输入内容后按回车搜索">
+         <button type="submit"><i class="ti-search"></i>
+         </button>
+      </form>
+   </div>
+   <!-- categories -->
+   <div class="widget">
+      <h5 class="widget-title"><span>分类</span></h5>
+      <ul class="list-unstyled widget-list">
+         {{ range  .categories  }}
+         <li><a href="/cate/{{.ID}}/" class="d-flex">{{.Name}}
+               <small class="ml-auto">({{.Count}})</small></a>
+         </li>
+         {{ end }}
+
+      </ul>
+   </div>
+   <!-- tags -->
+   <div class="widget">
+      <h5 class="widget-title"><span>标签</span></h5>
+      <ul class="list-inline widget-list-inline">
+
+         {{ range  .tags  }}
+         <li class="list-inline-item"><a href="/tags/{{.ID}}/">{{.Name}}</a>
+         </li>
+         {{ end }}
+
+      </ul>
+   </div>
+   <!-- latest post -->
+   <div class="widget">
+      <h5 class="widget-title"><span>最后更新</span></h5>
+      <!-- post-item -->
+       {{ range  .top3blog  }}
+       <ul class="list-unstyled widget-list">
+           <li class="media widget-post align-items-center">
+               <a href="/detail_{{.ID}}.html">
+                   <img loading="lazy" class="mr-3" src="{{index .Imagess 0}}">
+               </a>
+               <div class="media-body">
+                   <h5 class="h6 mb-0"><a href="/detail_{{.ID}}.html">{{.Title}}</a></h5>
+                   <small>{{.AddtimeFormat}}</small>
+               </div>
+           </li>
+       </ul>
+       {{ end }}
+
+   </div>
+			</aside>
+		</div>
+	</div>
+</section>
+<!-- footer -->
+{{template "partials/footer" .}}
+<!-- /footer -->
+   <!-- JS Plugins -->
+   <script src="plugins/jQuery/jquery.min.js"></script>
+   <script src="plugins/bootstrap/bootstrap.min.js" async></script>
+   <script src="plugins/slick/slick.min.js"></script>
+
+   <!-- Main Script -->
+   <script src="js/script.js"></script>
+<!--layui-->
+<script src="/component/layui/layui.js"></script>
+<script>
+   layui.use(function(){
+      var laypage = layui.laypage;
+      laypage.render({
+         elem: 'list-laypage-normal-1',
+         count: {{ .page.ItemSize }},
+         limit: {{ .page.PageSize }},
+         curr: {{ .page.PageNo }},
+         jump: function(obj, first) {
+                 if (!first) {
+               location.href="/?page="+obj.curr ;
+            }
+         }
+      });
+
+
+   });
+</script>
+</body>
+</html>
