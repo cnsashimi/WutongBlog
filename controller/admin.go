@@ -651,6 +651,16 @@ func RouteAdmin(app *fiber.App, store *session.Store) {
 			"UPDATE_API": "/admin/cateupdatesubmit?id=" + strconv.FormatInt(categorie.ID, 10),
 		})
 	})
+	//TODO::后台categoriesupdate - 类型添加页
+	admincontroller.Get("categoriesinsert", func(c *fiber.Ctx) error {
+
+		return c.Render("admin/update", fiber.Map{
+			"Title":      config.Getsetting().Name,
+			"Name":       "",
+			"UPDATE_API": "/admin/cateinsertsubmit",
+		})
+	})
+
 	//TODO::后台cateupdatesubmit - 类型修改接收
 	admincontroller.Post("cateupdatesubmit", func(c *fiber.Ctx) error {
 		var catm model.CategoriesModel
@@ -682,6 +692,30 @@ func RouteAdmin(app *fiber.App, store *session.Store) {
 		})
 
 	})
+
+	//TODO::后台cateupdatesubmit - 类型添加接收
+	admincontroller.Post("cateinsertsubmit", func(c *fiber.Ctx) error {
+		var catm model.CategoriesModel
+		catm.Name = c.FormValue("Name")
+		suss := model.Insertcate(catm)
+
+		if suss {
+			return c.JSON(Jsonback{
+				Code: 0,
+				Msg:  "提交成功",
+				Data: nil,
+			})
+
+		}
+
+		return c.JSON(Jsonback{
+			Code: 1,
+			Msg:  "提交出错",
+			Data: nil,
+		})
+
+	})
+
 	//TODO::后台 - tags修改页
 	admincontroller.Get("tagsupdate", func(c *fiber.Ctx) error {
 

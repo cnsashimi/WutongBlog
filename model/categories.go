@@ -60,3 +60,11 @@ func Updatecate(cate CategoriesModel) bool {
 	return true
 
 }
+
+func Insertcate(cate CategoriesModel) bool {
+	if cate.Name == "" {
+		return false
+	}
+	config.Connect.Select("Name").Create(&cate)
+	return true
+}
